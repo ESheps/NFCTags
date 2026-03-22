@@ -1,54 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S21_FORENSIC_TOOLKIT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <style>
-        :root { --neon: #00ff41; --bg: #050505; }
-        body { background: var(--bg); color: var(--neon); font-family: monospace; padding: 20px; }
-        .card { border: 1px solid var(--neon); padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,255,65,0.2); }
-        h2 { margin-top: 0; font-size: 14px; border-bottom: 1px solid var(--neon); padding-bottom: 5px; }
-        input, button { background: #111; border: 1px solid var(--neon); color: var(--neon); padding: 8px; width: 100%; box-sizing: border-box; margin: 5px 0; }
-        button:active { background: var(--neon); color: #000; }
-        #output { font-size: 12px; white-space: pre-wrap; background: #000; padding: 10px; min-height: 50px; }
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px; box-sizing: border-box; }
+        #log { font-size: 12px; line-height: 1.2; text-shadow: 0 0 5px #0f0; }
+        .red { color: #f00; text-shadow: 0 0 8px #f00; font-weight: bold; }
+        .glitch { animation: flash 0.1s infinite; }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.1; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
-    <h3>[ROOT@FORENSIC_LAB_S21]</h3>
-    
-    <div class="card">
-        <h2>1. NETWORK_INFO</h2>
-        <button onclick="getIP()">FETCH_IP_DATA</button>
-        <div id="ip-out" style="font-size:11px">---</div>
-    </div>
-
-    <div class="card">
-        <h2>2. MAC_VENDOR_LOOKUP</h2>
-        <input type="text" id="mac" placeholder="XX:XX:XX:XX:XX:XX">
-        <button onclick="lookupMAC()">QUERY_DATABASE</button>
-    </div>
-
-    <div class="card">
-        <h2>3. SECURE_BURN_NOTE</h2>
-        <textarea id="note" style="width:100%;background:#111;color:var(--neon);border:1px solid var(--neon)" rows="3"></textarea>
-        <button onclick="genLink()">GENERATE_LINK</button>
-    </div>
-
+    <div id="log"></div>
     <script>
-        async function getIP() {
-            const res = await fetch('https://ipapi.co/json/');
-            const data = await res.json();
-            document.getElementById('ip-out').innerText = `IP: ${data.ip}\nORG: ${data.org}\nLOC: ${data.city}, ${data.country_name}`;
+        const log = document.getElementById('log');
+        const data = [
+            "> [OK] CONNECTION ESTABLISHED", "> BYPASSING KERNEL PANIC...", "> EXPLOITING CVE-2026-9295...", 
+            "> ROOT ACCESS GRANTED", "> DOWNLOADING PRIVATE_KEYS...", "> UPLOADING USER_DATA.DB...", 
+            "> CLONING MESSAGES...", "> WIPING LOGS...", "> [CRITICAL] SYSTEM OVERRIDE DETECTED"
+        ];
+        let i = 0;
+        function addLine() {
+            const p = document.createElement('div');
+            if (i >= data.length) {
+                p.innerHTML = `<span class="red glitch">CAUTION: SYSTEM WIPE IN PROGRESS... ${Math.random().toString(16).slice(2,8)}</span>`;
+            } else {
+                p.textContent = data[i++];
+            }
+            log.appendChild(p);
+            if (log.childNodes.length > 25) log.removeChild(log.firstChild);
+            setTimeout(addLine, i >= data.length ? 50 : 400);
         }
-        function lookupMAC() {
-            const mac = document.getElementById('mac').value;
-            window.open(`https://macvendors.com/query/${mac}`, '_blank');
-        }
-        function genLink() {
-            const note = btoa(document.getElementById('note').value);
-            alert(`Encrypted URI created. Copy this:\n?data=${note}`);
-        }
+        // Force full screen on first tap/interaction
+        document.body.onclick = () => document.documentElement.requestFullscreen();
+        addLine();
     </script>
 </body>
 </html>
